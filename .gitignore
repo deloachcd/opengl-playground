@@ -1,0 +1,16 @@
+# vim swap files
+*.swp
+**/*.swp
+
+# cmake files
+CMakeCache.txt
+CMakeFiles/*
+Makefile
+cmake_install.cmake
+
+# library files
+.local/include/*
+lib/glm/*
+
+# executable
+project
