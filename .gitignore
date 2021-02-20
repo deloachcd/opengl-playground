@@ -10,7 +10,7 @@ cmake_install.cmake
 
 # library files
 .local/include/*
-lib/glm/*
+lib/*
 
 # executable
 project

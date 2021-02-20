@@ -1,0 +1,1 @@
+int spin_triangle();
