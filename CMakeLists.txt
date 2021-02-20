@@ -10,10 +10,10 @@ set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
 add_subdirectory($ENV{HOME}/.local/include/glfw $ENV{PWD}/.local/include/glfw/src)
 
-
+CMAKE_POLICY(SET CMP0072 NEW)  # use GLVND over legacy OpenGL
 FIND_PACKAGE(OpenGL REQUIRED)
 
-SET(SOURCE_FILES main.cpp)
+SET(SOURCE_FILES main.cpp spinning_triangle.cpp)
 
 ADD_EXECUTABLE(project ${SOURCE_FILES})
 TARGET_LINK_LIBRARIES(project glfw)
