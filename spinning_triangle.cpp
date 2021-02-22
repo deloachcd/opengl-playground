@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include <math.h>
 
+#include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include "lib/glm/matrix.hpp"
-#include "lib/glm/vector_relational.hpp"
+#include <glm/matrix.hpp>
+#include <glm/vector_relational.hpp>
 
 #define PI 3.14159265
 
@@ -35,16 +36,27 @@ int spin_triangle() {
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
 
+    /* Sanity check for GLEW */
+    GLenum err = glewInit();
+    if (GLEW_OK != err) {
+        printf("OH NO INDEPENDENCE DAY\n");
+    }
+
     /* Initialize variables to be used in the loop */
 
     int ROTATION_FACTOR = 5;  // degrees to rotate per frame
 
-    // matrix for rotation
-    glm::dmat2x2 rotm = rotation_matrix(ROTATION_FACTOR);
-    // vectors for triangle
-    glm::dvec2 v1 = glm::dvec2(-0.5f, -0.5f);
-    glm::dvec2 v2 = glm::dvec2( 0.0f,  0.5f);
-    glm::dvec2 v3 = glm::dvec2( 0.5f, -0.5f);
+    // matrices for rotation
+    glm::dmat2x2 rotm_clock = rotation_matrix(ROTATION_FACTOR);
+    glm::dmat2x2 rotm_counter = glm::inverse(rotm_clock);
+
+    // vectors for triangle 1
+    glm::dvec2 t1v1 = glm::dvec2(-0.5f, -0.5f);
+    glm::dvec2 t1v2 = glm::dvec2( 0.0f,  0.5f);
+    glm::dvec2 t1v3 = glm::dvec2( 0.5f, -0.5f);
+    glm::dvec2 t2v3 = glm::dvec2(-0.5f, -0.5f);
+    glm::dvec2 t2v2 = glm::dvec2( 0.0f,  0.5f);
+    glm::dvec2 t2v1 = glm::dvec2( 0.5f, -0.5f);
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
@@ -53,21 +65,24 @@ int spin_triangle() {
         glClear(GL_COLOR_BUFFER_BIT);
 
         /* Apply rotation to triangle vertices */
-        v1 = rotm * v1;
-        v2 = rotm * v2;
-        v3 = rotm * v3;
+        t1v1 = rotm_clock * t1v1;
+        t1v2 = rotm_clock * t1v2;
+        t1v3 = rotm_clock * t1v3;
+        t2v1 = rotm_counter * t2v1;
+        t2v2 = rotm_counter * t2v2;
+        t2v3 = rotm_counter * t2v3;
 
-        /* Draw a triangle */
+        /* Draw the triangles */
         glBegin(GL_TRIANGLES);
-        glVertex2f(v1[0], v1[1]);
-        glVertex2f(v2[0], v2[1]);
-        glVertex2f(v3[0], v3[1]);
+        glVertex2f(t1v1[0], t1v1[1]);
+        glVertex2f(t1v2[0], t1v2[1]);
+        glVertex2f(t1v3[0], t1v3[1]);
         glEnd();
-
-        /* Print coordinates */
-        if ((int)(v1[0]*10) == -4 && (int)(v1[1]*10) == -5) {
-            rotm = glm::inverse(rotm);
-        }
+        glBegin(GL_TRIANGLES);
+        glVertex2f(t2v1[0], t2v1[1]);
+        glVertex2f(t2v2[0], t2v2[1]);
+        glVertex2f(t2v3[0], t2v3[1]);
+        glEnd();
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);

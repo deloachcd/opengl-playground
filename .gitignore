@@ -8,9 +8,15 @@ CMakeFiles/*
 Makefile
 cmake_install.cmake
 
-# library files
+# binary files
+bin/*
+
+# dependency/library files
 .local/include/*
+deps/glfw/*
+deps/glm/*
+deps/glew/*
 lib/*
 
 # executable
-project
+main
