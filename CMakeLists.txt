@@ -16,7 +16,7 @@ INCLUDE_DIRECTORIES(deps/glew/include)
 CMAKE_POLICY(SET CMP0072 NEW)  # use GLVND over legacy OpenGL
 FIND_PACKAGE(OpenGL REQUIRED)
 
-SET(SOURCE_FILES main.cpp spinning_triangle.cpp)
+SET(SOURCE_FILES main.cpp spinning_triangle_2.cpp)
 
 ADD_EXECUTABLE(main ${SOURCE_FILES})
 TARGET_LINK_LIBRARIES(main glfw)

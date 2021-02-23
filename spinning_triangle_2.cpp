@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <math.h>
 
+#include <iostream>
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm/matrix.hpp>
@@ -13,9 +15,16 @@ glm::dmat2x2 rotation_matrix(int theta) {
      * [ cos() -sin()
      *   sin() cos()  ]
      */
-    double r = theta*PI/180;
+    float r = theta*PI/180;
     return glm::dmat2x2(cos(r), -sin(r),
                         sin(r),  cos(r));
+}
+
+void push_vec2(glm::vec2* arr_vectors, float buffer[], unsigned n_vec2) {
+    for (unsigned i = 0; i < n_vec2; i++) {
+        buffer[i*2] = arr_vectors[i][0];
+        buffer[(i*2)+1] = arr_vectors[i][1];
+    }
 }
 
 int spin_triangle() {
@@ -50,15 +59,26 @@ int spin_triangle() {
 
     // matrices for rotation
     glm::dmat2x2 rotm_clock = rotation_matrix(ROTATION_FACTOR);
-    glm::dmat2x2 rotm_counter = glm::inverse(rotm_clock);
 
-    // vectors for triangle 1
-    glm::dvec2 t1v1 = glm::dvec2(-0.5f, -0.5f);
-    glm::dvec2 t1v2 = glm::dvec2( 0.0f,  0.5f);
-    glm::dvec2 t1v3 = glm::dvec2( 0.5f, -0.5f);
-    glm::dvec2 t2v3 = glm::dvec2(-0.5f, -0.5f);
-    glm::dvec2 t2v2 = glm::dvec2( 0.0f,  0.5f);
-    glm::dvec2 t2v1 = glm::dvec2( 0.5f, -0.5f);
+    // vectors for triangle
+    glm::vec2 vectors[] = {
+        glm::vec2(-0.5f, -0.5f),
+        glm::vec2( 0.0f,  0.5f),
+        glm::vec2( 0.5f, -0.5f)
+    };
+
+    // buffer for vector positions
+    float vposition[sizeof(float)*6];
+    push_vec2(vectors, vposition, sizeof(vectors)/sizeof(glm::vec2));
+
+    // glGenBuffers(n_buffers, 
+    unsigned int buffer;
+    glGenBuffers(1, &buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, buffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*6, vposition, GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float)*2, 0);
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
@@ -66,25 +86,8 @@ int spin_triangle() {
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
 
-        /* Apply rotation to triangle vertices */
-        t1v1 = rotm_clock * t1v1;
-        t1v2 = rotm_clock * t1v2;
-        t1v3 = rotm_clock * t1v3;
-        t2v1 = rotm_counter * t2v1;
-        t2v2 = rotm_counter * t2v2;
-        t2v3 = rotm_counter * t2v3;
-
-        /* Draw the triangles */
-        glBegin(GL_TRIANGLES);
-        glVertex2f(t1v1[0], t1v1[1]);
-        glVertex2f(t1v2[0], t1v2[1]);
-        glVertex2f(t1v3[0], t1v3[1]);
-        glEnd();
-        glBegin(GL_TRIANGLES);
-        glVertex2f(t2v1[0], t2v1[1]);
-        glVertex2f(t2v2[0], t2v2[1]);
-        glVertex2f(t2v3[0], t2v3[1]);
-        glEnd();
+        /* Draw triangle from buffer */
+        glDrawArrays(GL_TRIANGLES, 0, 3);
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);

@@ -18,5 +18,8 @@ deps/glm/*
 deps/glew/*
 lib/*
 
+#ctags
+tags
+
 # executable
 main
