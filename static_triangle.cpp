@@ -125,13 +125,20 @@ int spin_triangle() {
     // vectors for triangle
     glm::vec2 vectors[] = {
         glm::vec2(-0.5f, -0.5f),
-        glm::vec2( 0.0f,  0.5f),
-        glm::vec2( 0.5f, -0.5f)
+        glm::vec2(-0.5f,  0.5f),
+        glm::vec2( 0.5f, -0.5f),
+        glm::vec2( 0.5f,  0.5f)
     };
+    unsigned int indices[] = {
+        0, 1, 2,
+        1, 2, 3
+    };
+    size_t n_vectors = sizeof(vectors)/sizeof(glm::vec2);
+    size_t n_indices = sizeof(indices)/sizeof(unsigned);
 
     // buffer for vector positions
-    float vposition[sizeof(float)*6];
-    push_vec2(vectors, vposition, sizeof(vectors)/sizeof(glm::vec2));
+    float vposition[sizeof(float)*n_vectors];
+    push_vec2(vectors, vposition, n_vectors);
 
     unsigned int vertexArrayID;
     glGenVertexArrays(1, &vertexArrayID);
@@ -140,14 +147,17 @@ int spin_triangle() {
     unsigned int buffer;
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*6, vposition, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*n_vectors*2, vposition, GL_STATIC_DRAW);
+
+    unsigned int ibo;
+    glGenBuffers(1, &ibo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned)*n_indices*2, indices, GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float)*2, 0);
 
     ShaderSource source = ParseShader("res/shaders/basic.shader");
-    std::cout << source.vertex << std::endl;
-    std::cout << source.fragment << std::endl;
     unsigned int shader = CreateShader(source.vertex, source.fragment);
     glUseProgram(shader);
 
@@ -157,8 +167,8 @@ int spin_triangle() {
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
 
-        /* Draw triangle from buffer */
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        /* Draw elements from buffer */
+        glDrawElements(GL_TRIANGLES, n_indices, GL_UNSIGNED_INT, nullptr);
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
