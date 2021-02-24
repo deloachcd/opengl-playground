@@ -26,7 +26,7 @@ int spin_triangle() {
         return -1;
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(960, 720, "Hello World", NULL, NULL);
+    window = glfwCreateWindow(960, 720, "wah", NULL, NULL);
     if (!window)
     {
         glfwTerminate();

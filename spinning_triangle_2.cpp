@@ -72,6 +72,11 @@ int spin_triangle() {
     if (!glfwInit())
         return -1;
 
+    /* Need this to enable GLSL 3.3 core */
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
     /* Create a windowed mode window and its OpenGL context */
     window = glfwCreateWindow(960, 720, "Hello World", NULL, NULL);
     if (!window)
@@ -109,7 +114,10 @@ int spin_triangle() {
     float vposition[sizeof(float)*6];
     push_vec2(vectors, vposition, sizeof(vectors)/sizeof(glm::vec2));
 
-    // glGenBuffers(n_buffers, 
+    unsigned int vertexArrayID;
+    glGenVertexArrays(1, &vertexArrayID);
+    glBindVertexArray(vertexArrayID);
+
     unsigned int buffer;
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
@@ -119,15 +127,15 @@ int spin_triangle() {
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float)*2, 0);
 
     std::string vShader = R"EOF(
-    #version 310 es
+    #version 330 core
     layout(location = 0) in vec4 position;
     void main() {
         gl_Position = position;
     }
     )EOF";
     std::string fShader = R"EOF(
-    #version 310 es
-    layout(location = 0) out mediump vec4 color;
+    #version 330 core
+    layout(location = 0) out vec4 color;
     void main() {
         color = vec4(0.0, 1.0, 1.0, 1.0);
     }
