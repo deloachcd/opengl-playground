@@ -17,7 +17,7 @@
 // to have to figure out how all those enums in the signature work
 //
 // https://gist.github.com/liam-middlebrook/c52b069e4be2d87a6d2f
-void APIENTRY GLDebugMessageCallback(GLenum source, GLenum type, GLuint id,
+void APIENTRY glDebugCallback(GLenum source, GLenum type, GLuint id,
                             GLenum severity, GLsizei length,
                             const GLchar *msg, const void *data)
 {
@@ -201,10 +201,11 @@ int spin_triangle() {
     if (!glfwInit())
         return -1;
 
-    /* Need this to enable GLSL 3.3 core */
+    /* Request OpenGL 4.5 */
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 
     /* Create a windowed mode window and its OpenGL context */
     window = glfwCreateWindow(960, 720, "Hello World", NULL, NULL);
@@ -217,6 +218,7 @@ int spin_triangle() {
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
 
+
     /* Sanity check for GLEW */
     GLenum err = glewInit();
     if (GLEW_OK != err) {
@@ -224,6 +226,11 @@ int spin_triangle() {
     } else {
         printf("%s\n", glGetString(GL_VERSION));
     }
+
+    /* Assign callback function to write to errorString */
+    glEnable(GL_DEBUG_OUTPUT);
+    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+    glDebugMessageCallback(glDebugCallback, nullptr);
 
     /* Initialize variables to be used in the loop */
 
